@@ -1,3 +1,7 @@
+/* Comando de compilação
+gcc robot.c -o robot -lGL -lGLU -lglut -lm
+*/
+
 /* Manual de teclas:
 Cima: rotação vertical anti-horária;
 Baixo: rotação vertical horária;
