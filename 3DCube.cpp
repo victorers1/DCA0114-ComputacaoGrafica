@@ -81,7 +81,8 @@ void timer(int)
 void init(int argc, char **argv)
 {
     glutInit(&argc, argv);
-    glutInitDisplayMode(GLUT_RGB | GLUT_DOUBLE | GL_DEPTH);
+	glEnable(GL_DEPTH_TEST);
+    glutInitDisplayMode(GLUT_RGB | GLUT_DOUBLE | GLUT_DEPTH);
 
     glClearColor(0.0, 0.0, 0.0, 1.0);    // cor da tela ao ser apagada (R, G, B, a)
     glutInitWindowPosition(200, 100);    // posição inicial da janela em pixels

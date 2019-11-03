@@ -1,4 +1,4 @@
-//g++ aula2.cpp -o a2 -lGL -lGLU -lglut -lm
+//g++ aula3.cpp -o a3 -lGL -lGLU -lglut -lm
 //Animated square
 
 #include <GL/gl.h>
@@ -20,17 +20,17 @@ void render(void)
 
     glShadeModel(GL_SMOOTH); // forma padrão de misturar cores de diferentes vértices
     glBegin(GL_POLYGON);     //GL_POLYGON, GL_QUADS
-        glColor3f(1.0, 0.0, 0.0);
-        glVertex2f(-1.0, 1.0);
+    glColor3f(1.0, 0.0, 0.0);
+    glVertex2f(-1.0, 1.0);
 
-        glColor3f(0.0, 1.0, 0.0);
-        glVertex2f(-1.0, -1.0);
+    glColor3f(0.0, 1.0, 0.0);
+    glVertex2f(-1.0, -1.0);
 
-        glColor3f(0.0, 0.0, 1.0);
-        glVertex2f(1.0, -1.0);
+    glColor3f(0.0, 0.0, 1.0);
+    glVertex2f(1.0, -1.0);
 
-        glColor3f(1.0, 1.0, 1.0);
-        glVertex2f(1.0, 1.0);
+    glColor3f(1.0, 1.0, 1.0);
+    glVertex2f(1.0, 1.0);
     glEnd();
 
     glutSwapBuffers();
@@ -73,9 +73,9 @@ void init(int argc, char **argv)
 {
     glutInit(&argc, argv);
     glutInitDisplayMode(GLUT_RGB | GLUT_DOUBLE);
-    glClearColor(0.0, 0.0, 0.0, 1.0);    // cor da tela ao ser apagada (R, G, B, a)
-    glutInitWindowPosition(200, 100);    // posição inicial da janela em pixels
-    glutInitWindowSize(500, 500);        // tamanho inicial da janela
+    glClearColor(0.0, 0.0, 0.0, 1.0);                 // cor da tela ao ser apagada (R, G, B, a)
+    glutInitWindowPosition(200, 100);                 // posição inicial da janela em pixels
+    glutInitWindowSize(500, 500);                     // tamanho inicial da janela
     glutCreateWindow("Translating Colorized Square"); // Título da janela
 
     glutDisplayFunc(render);
