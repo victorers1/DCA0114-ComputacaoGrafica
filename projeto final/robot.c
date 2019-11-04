@@ -6,18 +6,18 @@
 */
 
 /* Manual de teclas:
-  Cima: rotação anti-horária em torno de Z;
-  Baixo: rotação horária em torno de Z;
-  Esquerda: rotação em torno de Y;
-  Direita: rotação em torno de Y;
+  Cima: rotação anti-horária em torno de Y;
+  Baixo: rotação horária em torno de Y;
+  Esquerda: rotação em torno de X;
+  Direita: rotação em torno de X;
 
-  s, S: rotação em X;
+  s, S: ombro;
   e, E: cotovelo;
   d,D: punho;
   c, C: roda punho e antebraço juntos;
   u, U: dedo anelar;
   i, I: dedo polegar;
-  o, O: dedo indicador
+  o, O: dedo indicador;
 */
 
 #include <GL/gl.h>
@@ -29,16 +29,17 @@
 
 # define PI 3.14159265358979323846
 
-void draw3DRectangle(float x, float y, float z, float w, float h, float l, float c[8][3]); //centro (x,y,z), dimensões (w,h,l), cores
 void randomColors(float matriz[8][3]); // são 8 vértices, cada um com 3 componentes de cores
 
 static int shoulder = 0, elbow = -45, fist = -45, d1 = 0, d2 = 0, d3 = 0, soma = 1, horizontal = 0, vertical = 0;
+//CORES
 float ombro[8][3]; //cores do retângulo ombro
 float antebraco[8][3]; //cores do retângulo antebraço
 float punho[8][3];
 float dedo1[8][3];
 float dedo2[8][3]; //dedo do meio
 float dedo3[8][3];
+float cil[3] = {1.0, 1.0, 1.0};
 
 void init(void) {
   glClearColor(0.0, 0.0, 0.0, 0.0);
@@ -55,17 +56,85 @@ void init(void) {
   randomColors(dedo3);
 }
 
+/**
+Desenha um retângulo cujo centro está em (x, y, z), tem dimensões 'w', 'h' e 'l'
+e seus vértices têm cores salvos na matriz c.
+*/
+void draw3DRectangle(float x, float y, float z, float w, float h, float l, float c[8][3]) {
+    w/=2;
+    h/=2;
+    l/=2;
+    glBegin(GL_QUADS); //GL_POLYGON, GL_TRIANGLES
+      //front
+      glColor3f(c[0][0], c[0][1], c[0][2]); glVertex3f(x-w, y+h, z+l); //-++
+      glColor3f(c[1][0], c[1][1], c[1][2]); glVertex3f(x-w, y-h, z+l); //--+
+      glColor3f(c[2][0], c[2][1], c[2][2]); glVertex3f(x+w, y-h, z+l); //+-+
+      glColor3f(c[3][0], c[3][1], c[3][2]); glVertex3f(x+w, y+h, z+l); //+++
+
+      //back
+      glColor3f(c[4][0], c[4][1], c[4][2]); glVertex3f(x+w, y+h, z-l); //++-
+      glColor3f(c[5][0], c[5][1], c[5][2]); glVertex3f(x+w, y-h, z-l); //+--
+      glColor3f(c[6][0], c[6][1], c[6][2]); glVertex3f(x-w, y-h, z-l); //---
+      glColor3f(c[7][0], c[7][1], c[7][2]); glVertex3f(x-w, y+h, z-l); //-+-
+
+      //right
+      glColor3f(c[3][0], c[3][1], c[3][2]); glVertex3f(x+w, y+h, z+l); //+++
+      glColor3f(c[2][0], c[2][1], c[2][2]); glVertex3f(x+w, y-h, z+l); //+-+
+      glColor3f(c[5][0], c[5][1], c[5][2]); glVertex3f(x+w, y-h, z-l); //+--
+      glColor3f(c[4][0], c[4][1], c[4][2]); glVertex3f(x+w, y+h, z-l); //++-
+
+      //left
+      glColor3f(c[7][0], c[7][1], c[7][2]); glVertex3f(x-w, y+h, z-l); //-+-
+      glColor3f(c[5][0], c[5][1], c[5][2]);  glVertex3f(x-w, y-h, z-l); //---
+      glColor3f(c[1][0], c[1][1], c[1][2]); glVertex3f(x-w, y-h, z+l); //--+
+      glColor3f(c[0][0], c[0][1], c[0][2]); glVertex3f(x-w, y+h, z+l); //-++
+
+      //top
+      glColor3f(c[7][0], c[7][1], c[7][2]); glVertex3f(x-w, y+h, z-l); //-+-
+      glColor3f(c[0][0], c[0][1], c[0][2]); glVertex3f(x-w, y+h, z+l); //-++
+      glColor3f(c[3][0], c[3][1], c[3][2]); glVertex3f(x+w, y+h, z+l); //+++
+      glColor3f(c[4][0], c[4][1], c[4][2]); glVertex3f(x+w, y+h, z-l); //++-
+
+      //bottom
+      glColor3f(c[5][0], c[5][1], c[5][2]); glVertex3f(x-w, y-h, z-l); //---
+      glColor3f(c[1][0], c[1][1], c[1][2]); glVertex3f(x-w, y-h, z+l); //--+
+      glColor3f(c[2][0], c[2][1], c[2][2]); glVertex3f(x+w, y-h, z+l); //+-+
+      glColor3f(c[5][0], c[5][1], c[5][2]); glVertex3f(x+w, y-h, z-l); //+--
+    glEnd();
+}
+
+/**
+Desenha um cilindro que se extende no eixo Z cujo centro é (x,y,z), tem altura h
+e raio r. O cilindro tem corpo com cor dado em c[3] e as bases com cor dados em
+t[3].
+*/
+void draw3DCylinder(float x, float y, float z, float h, float r, float c[3], float t[3]) {
+  glColor3f(c[0], c[1], c[2]);
+
+  glPushMatrix();
+    glTranslatef(x,y,z);
+    glBegin(GL_QUAD_STRIP); //exibe uma sequência de quadriláteros conectados a cada 4 vértices
+      for (int i = 0; i < 370; i+=10) {
+        glVertex3f(r*cos(i*PI/180), r*sin(i*PI/180), h/2.0);
+        glVertex3f(r*cos(i*PI/180), r*sin(i*PI/180), -h/2.0);
+      }
+
+    for (int i = 0; i < 360; i+=10) {}
+    glEnd();
+  glPopMatrix();
+}
+
 void display(void) {
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
   glPushMatrix(); //inicio-1
-    glRotatef(90, 0.0, 0.0, 1.0);
-    glRotatef((GLfloat)shoulder, 1.0, 0.0, 0.0);
-    glRotatef((GLfloat)horizontal, 0.0, 1.0, 0.0);
-    glRotatef((GLfloat)vertical, 0.0, 0.0, 1.0);
+    glRotatef(90, .0, .0, 1.0);
+    glRotatef((GLfloat)vertical, .0, 1.0, .0);
+    glRotatef((GLfloat)horizontal, 1.0, .0, .0);
     glTranslatef(-1.0, 0.0, 0.0);
 
-    glColor3f(1.0, 1.0, 1.0);
+
+
     glBegin(GL_QUADS); //CHÃO
       glColor3f(1.0, 1.0, 1.0); glVertex3f(-1.01, 5.0, 5.0); // coord. x está um pouco abaixo de 1 para que não dê pra ver o braço na parte de baixo do chão
       glColor3f(.6, .6, .6); glVertex3f(-1.01, -5.0, 5.0);
@@ -73,20 +142,24 @@ void display(void) {
       glColor3f(.0, .0, .0); glVertex3f(-1.01, 5.0, -5.0);
     glEnd();
 
+    glTranslatef(-1.0, .0, .0);
+    glRotatef((GLfloat)shoulder, .0, .0, 1.0);
+    glTranslatef(1.0, .0, .0);
+    draw3DCylinder(1.0, 0.0, 0.0, 1, 0.2, cil, cil);
     draw3DRectangle(.0, .0, .0, 2.0, .4, 1.0, ombro);
 
     glTranslatef(1.0, .0, .0);
     glRotatef((GLfloat)elbow, .0, .0, 1.0); //rotaciona em torno do eixo Z do objeto
-    glTranslatef(1.0, .0, .0);
-    draw3DRectangle(.0, .0, .0, 2.0, .4, 1.0, antebraco);
+    glTranslatef(.5, .0, .0);
+    draw3DCylinder(0.5, 0.0, 0.0, 1, 0.2, cil, cil);
+    draw3DRectangle(.0, .0, .0, 1.0, .4, 1.0, antebraco);
 
-
-    glTranslatef(1.0, .0, .0);
+    glTranslatef(.5, .0, .0);
     glRotatef((GLfloat)fist, .0, .0, 1.0); //rotaciona em torno do eixo Z do objeto
-    glTranslatef(1.0, .0, .0);
-    draw3DRectangle(.0, .0, .0, 2.0, -.4, 1.0, punho);
+    glTranslatef(.75, .0, .0);
+    draw3DRectangle(.0, .0, .0, 1.5, -.4, 1.0, punho);
 
-    glTranslatef(1.0, .0, .0);
+    glTranslatef(.75, .0, .0);
 
     glPushMatrix(); //inicio-2
       glTranslatef(.0, -.1, .0);
@@ -157,58 +230,50 @@ void TeclasEspeciais(int key, int x, int y) {
 void keyboard(unsigned char key, int x, int y) {
   switch (key) {
   case 's': /*  s key rotates at shoulder  */
-    shoulder = (shoulder + soma) % 360;
+    if (shoulder >= -150) shoulder -= soma;
     break;
   case 'S':
-    shoulder = (shoulder - soma) % 360;
+    if (shoulder <= 0) shoulder += soma;
     break;
   case 'e': /*  e key rotates at elbow  */
-    if (elbow >= -150)
-      elbow -= soma;
+    if (elbow >= -150) elbow -= soma;
     break;
   case 'E':
-    if (elbow <= 0)
-      elbow += soma;
+    if (elbow <= 0) elbow += soma;
     break;
-  case 'd': /*  e key rotates at elbow  */
-    if (fist >= -150)
-      fist -= soma;
+  case 'd': /*  d key rotates at fist  */
+    if (fist >= -150) fist -= soma;
     break;
   case 'D':
-    if (fist <= 0)
-      fist += soma;
+    if (fist <= 0) fist += soma;
     break;
   case 'u':
-    if (d1 >= -75)
-      d1 -= soma;
+    if (d1 >= -75) d1 -= soma;
     break;
   case 'U': //esquerda
-    if (d1 <= 0)
-      d1 += soma;
+    if (d1 <= 0) d1 += soma;
     break;
   case 'i': //esquerda-> meio
-    if (d2 <= 75)
-      d2 += soma;
+    if (d2 <= 75) d2 += soma;
     break;
   case 'I':
-    if (d2 >= 0)
-      d2 -= soma;
+    if (d2 >= 0) d2 -= soma;
     break;
   case 'o': //esquerda-> meio
-    if (d3 >= -75)
-      d3 -= soma;
+    if (d3 >= -75) d3 -= soma;
     break;
   case 'O':
-    if (d3 <= 0)
-      d3 = d3 + soma;
+    if (d3 <= 0) d3 += soma;
     break;
   case 'c':
     if (elbow >= -50) elbow -= soma;
     if (fist >= -50) fist -= soma;
+    if (shoulder >= -50) shoulder -= soma;
     break;
   case 'C':
     if (elbow <= -1) elbow += soma;
     if (fist <= -1) fist += soma;
+    if (shoulder <= 0) shoulder += soma;
     break;
   default:
     break;
@@ -232,52 +297,7 @@ int main(int argc, char **argv) {
   return 0;
 }
 
-/**
-Desenha um retângulo cujo centro está em (x, y, z), tem dimensões 'w', 'h' e 'l'
-e seus vértices têm cores salvos na matriz c
-*/
-void draw3DRectangle(float x, float y, float z, float w, float h, float l, float c[8][3]) {
-    w/=2;
-    h/=2;
-    l/=2;
-    glBegin(GL_QUADS); //GL_POLYGON, GL_TRIANGLES
-      //front
-      glColor3f(c[0][0], c[0][1], c[0][2]); glVertex3f(x-w, y+h, z+l); //-++
-      glColor3f(c[1][0], c[1][1], c[1][2]); glVertex3f(x-w, y-h, z+l); //--+
-      glColor3f(c[2][0], c[2][1], c[2][2]); glVertex3f(x+w, y-h, z+l); //+-+
-      glColor3f(c[3][0], c[3][1], c[3][2]); glVertex3f(x+w, y+h, z+l); //+++
 
-      //back
-      glColor3f(c[4][0], c[4][1], c[4][2]); glVertex3f(x+w, y+h, z-l); //++-
-      glColor3f(c[5][0], c[5][1], c[5][2]); glVertex3f(x+w, y-h, z-l); //+--
-      glColor3f(c[6][0], c[6][1], c[6][2]); glVertex3f(x-w, y-h, z-l); //---
-      glColor3f(c[7][0], c[7][1], c[7][2]); glVertex3f(x-w, y+h, z-l); //-+-
-
-      //right
-      glColor3f(c[3][0], c[3][1], c[3][2]); glVertex3f(x+w, y+h, z+l); //+++
-      glColor3f(c[2][0], c[2][1], c[2][2]); glVertex3f(x+w, y-h, z+l); //+-+
-      glColor3f(c[5][0], c[5][1], c[5][2]); glVertex3f(x+w, y-h, z-l); //+--
-      glColor3f(c[4][0], c[4][1], c[4][2]); glVertex3f(x+w, y+h, z-l); //++-
-
-      //left
-      glColor3f(c[7][0], c[7][1], c[7][2]); glVertex3f(x-w, y+h, z-l); //-+-
-      glColor3f(c[5][0], c[5][1], c[5][2]);  glVertex3f(x-w, y-h, z-l); //---
-      glColor3f(c[1][0], c[1][1], c[1][2]); glVertex3f(x-w, y-h, z+l); //--+
-      glColor3f(c[0][0], c[0][1], c[0][2]); glVertex3f(x-w, y+h, z+l); //-++
-
-      //top
-      glColor3f(c[7][0], c[7][1], c[7][2]); glVertex3f(x-w, y+h, z-l); //-+-
-      glColor3f(c[0][0], c[0][1], c[0][2]); glVertex3f(x-w, y+h, z+l); //-++
-      glColor3f(c[3][0], c[3][1], c[3][2]); glVertex3f(x+w, y+h, z+l); //+++
-      glColor3f(c[4][0], c[4][1], c[4][2]); glVertex3f(x+w, y+h, z-l); //++-
-
-      //bottom
-      glColor3f(c[5][0], c[5][1], c[5][2]); glVertex3f(x-w, y-h, z-l); //---
-      glColor3f(c[1][0], c[1][1], c[1][2]); glVertex3f(x-w, y-h, z+l); //--+
-      glColor3f(c[2][0], c[2][1], c[2][2]); glVertex3f(x+w, y-h, z+l); //+-+
-      glColor3f(c[5][0], c[5][1], c[5][2]); glVertex3f(x+w, y-h, z-l); //+--
-    glEnd();
-}
 
 /**
   Atribui valores aleatórios aos elementos de uma matriz de floats [8][3]
