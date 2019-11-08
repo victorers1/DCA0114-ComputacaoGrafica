@@ -41,11 +41,47 @@ float dedo2[8][3]; //dedo do meio
 float dedo3[8][3];
 float cil[3] = {1.0, 1.0, 1.0};
 
+
+
+//GLfloat ambientColor[] = {0.4f, 0.4f, 0.4f, 1.0f}; //Color(0.2, 0.2, 0.2)
+//GLfloat light0color[]    = { 1.0, 1.0, 1.0, 0.0 };
+//GLfloat light0position[] = { -5.0, 0.0, 0.0, 0.0 };
+
 void init(void) {
   glClearColor(0.0, 0.0, 0.0, 0.0);
   glShadeModel(GL_SMOOTH);
-  glEnable(GL_DEPTH_TEST);
 
+  glEnable(GL_DEPTH_TEST);
+  // glEnable(GL_LIGHTING);
+  // glEnable(GL_LIGHT0);
+  // glEnable(GL_COLOR_MATERIAL);
+  // glEnable(GL_NORMALIZE);
+
+/*GLfloat mat_specular[] = { 1.0, 1.0, 1.0, 1.0 };
+  GLfloat mat_shininess[] = { 50.0 };
+
+  glMaterialfv(GL_FRONT, GL_SPECULAR, mat_specular);
+  glMaterialfv(GL_FRONT, GL_SHININESS, mat_shininess);
+  glLightfv(GL_LIGHT0, GL_POSITION, light_position);*/
+
+
+  GLfloat ambientColor[] = {0.4f, 0.4f, 0.4f, 1.0f}; //Color(0.2, 0.2, 0.2)
+  GLfloat light0color[]    = { 1.0, 1.0, 1.0, 0.0 };
+  GLfloat light0position[] = { 15.0, 5.0, 15.0, 0.0 };		// x, y, z, 1:directional 0:point
+
+  GLfloat mat_diffuse[] = { 0.6, 0.6, 0.6, 1.0 };
+  GLfloat mat_ambient[] = { 0.4, 0.4, 0.4, 1.0 };
+  GLfloat mat_specular[] = { 1.0, 1.0, 1.0, 1.0 };
+  GLfloat low_shininess[] = { 50.0 };
+
+  glLightModelfv(GL_LIGHT_MODEL_AMBIENT, ambientColor);
+  glLightfv(GL_LIGHT0, GL_DIFFUSE, light0color);
+  glLightfv(GL_LIGHT0, GL_POSITION, light0position);
+
+  glMaterialfv(GL_FRONT, GL_DIFFUSE, mat_diffuse);
+  glMaterialfv(GL_FRONT, GL_AMBIENT, mat_ambient);
+  glMaterialfv(GL_FRONT, GL_SPECULAR, mat_specular);
+  glMaterialfv(GL_FRONT, GL_SHININESS, low_shininess);
 
   //Cria cores
   randomColors(ombro);
@@ -61,46 +97,46 @@ Desenha um retângulo cujo centro está em (x, y, z), tem dimensões 'w', 'h' e 
 e seus vértices têm cores salvos na matriz c.
 */
 void draw3DRectangle(float x, float y, float z, float w, float h, float l, float c[8][3]) {
-    w/=2;
-    h/=2;
-    l/=2;
-    glBegin(GL_QUADS); //GL_POLYGON, GL_TRIANGLES
-      //front
-      glColor3f(c[0][0], c[0][1], c[0][2]); glVertex3f(x-w, y+h, z+l); //-++
-      glColor3f(c[1][0], c[1][1], c[1][2]); glVertex3f(x-w, y-h, z+l); //--+
-      glColor3f(c[2][0], c[2][1], c[2][2]); glVertex3f(x+w, y-h, z+l); //+-+
-      glColor3f(c[3][0], c[3][1], c[3][2]); glVertex3f(x+w, y+h, z+l); //+++
+  w/=2;
+  h/=2;
+  l/=2;
+  glBegin(GL_QUADS); //GL_POLYGON, GL_TRIANGLES
+    //front
+    glColor3f(c[0][0], c[0][1], c[0][2]); glVertex3f(x-w, y+h, z+l); //-++
+    glColor3f(c[1][0], c[1][1], c[1][2]); glVertex3f(x-w, y-h, z+l); //--+
+    glColor3f(c[2][0], c[2][1], c[2][2]); glVertex3f(x+w, y-h, z+l); //+-+
+    glColor3f(c[3][0], c[3][1], c[3][2]); glVertex3f(x+w, y+h, z+l); //+++
 
-      //back
-      glColor3f(c[4][0], c[4][1], c[4][2]); glVertex3f(x+w, y+h, z-l); //++-
-      glColor3f(c[5][0], c[5][1], c[5][2]); glVertex3f(x+w, y-h, z-l); //+--
-      glColor3f(c[6][0], c[6][1], c[6][2]); glVertex3f(x-w, y-h, z-l); //---
-      glColor3f(c[7][0], c[7][1], c[7][2]); glVertex3f(x-w, y+h, z-l); //-+-
+    //back
+    glColor3f(c[4][0], c[4][1], c[4][2]); glVertex3f(x+w, y+h, z-l); //++-
+    glColor3f(c[5][0], c[5][1], c[5][2]); glVertex3f(x+w, y-h, z-l); //+--
+    glColor3f(c[6][0], c[6][1], c[6][2]); glVertex3f(x-w, y-h, z-l); //---
+    glColor3f(c[7][0], c[7][1], c[7][2]); glVertex3f(x-w, y+h, z-l); //-+-
 
-      //right
-      glColor3f(c[3][0], c[3][1], c[3][2]); glVertex3f(x+w, y+h, z+l); //+++
-      glColor3f(c[2][0], c[2][1], c[2][2]); glVertex3f(x+w, y-h, z+l); //+-+
-      glColor3f(c[5][0], c[5][1], c[5][2]); glVertex3f(x+w, y-h, z-l); //+--
-      glColor3f(c[4][0], c[4][1], c[4][2]); glVertex3f(x+w, y+h, z-l); //++-
+    //right
+    glColor3f(c[3][0], c[3][1], c[3][2]); glVertex3f(x+w, y+h, z+l); //+++
+    glColor3f(c[2][0], c[2][1], c[2][2]); glVertex3f(x+w, y-h, z+l); //+-+
+    glColor3f(c[5][0], c[5][1], c[5][2]); glVertex3f(x+w, y-h, z-l); //+--
+    glColor3f(c[4][0], c[4][1], c[4][2]); glVertex3f(x+w, y+h, z-l); //++-
 
-      //left
-      glColor3f(c[7][0], c[7][1], c[7][2]); glVertex3f(x-w, y+h, z-l); //-+-
-      glColor3f(c[5][0], c[5][1], c[5][2]);  glVertex3f(x-w, y-h, z-l); //---
-      glColor3f(c[1][0], c[1][1], c[1][2]); glVertex3f(x-w, y-h, z+l); //--+
-      glColor3f(c[0][0], c[0][1], c[0][2]); glVertex3f(x-w, y+h, z+l); //-++
+    //left
+    glColor3f(c[7][0], c[7][1], c[7][2]); glVertex3f(x-w, y+h, z-l); //-+-
+    glColor3f(c[5][0], c[5][1], c[5][2]);  glVertex3f(x-w, y-h, z-l); //---
+    glColor3f(c[1][0], c[1][1], c[1][2]); glVertex3f(x-w, y-h, z+l); //--+
+    glColor3f(c[0][0], c[0][1], c[0][2]); glVertex3f(x-w, y+h, z+l); //-++
 
-      //top
-      glColor3f(c[7][0], c[7][1], c[7][2]); glVertex3f(x-w, y+h, z-l); //-+-
-      glColor3f(c[0][0], c[0][1], c[0][2]); glVertex3f(x-w, y+h, z+l); //-++
-      glColor3f(c[3][0], c[3][1], c[3][2]); glVertex3f(x+w, y+h, z+l); //+++
-      glColor3f(c[4][0], c[4][1], c[4][2]); glVertex3f(x+w, y+h, z-l); //++-
+    //top
+    glColor3f(c[7][0], c[7][1], c[7][2]); glVertex3f(x-w, y+h, z-l); //-+-
+    glColor3f(c[0][0], c[0][1], c[0][2]); glVertex3f(x-w, y+h, z+l); //-++
+    glColor3f(c[3][0], c[3][1], c[3][2]); glVertex3f(x+w, y+h, z+l); //+++
+    glColor3f(c[4][0], c[4][1], c[4][2]); glVertex3f(x+w, y+h, z-l); //++-
 
-      //bottom
-      glColor3f(c[5][0], c[5][1], c[5][2]); glVertex3f(x-w, y-h, z-l); //---
-      glColor3f(c[1][0], c[1][1], c[1][2]); glVertex3f(x-w, y-h, z+l); //--+
-      glColor3f(c[2][0], c[2][1], c[2][2]); glVertex3f(x+w, y-h, z+l); //+-+
-      glColor3f(c[5][0], c[5][1], c[5][2]); glVertex3f(x+w, y-h, z-l); //+--
-    glEnd();
+    //bottom
+    glColor3f(c[5][0], c[5][1], c[5][2]); glVertex3f(x-w, y-h, z-l); //---
+    glColor3f(c[1][0], c[1][1], c[1][2]); glVertex3f(x-w, y-h, z+l); //--+
+    glColor3f(c[2][0], c[2][1], c[2][2]); glVertex3f(x+w, y-h, z+l); //+-+
+    glColor3f(c[5][0], c[5][1], c[5][2]); glVertex3f(x+w, y-h, z-l); //+--
+  glEnd();
 }
 
 /**
@@ -109,17 +145,21 @@ e raio r. O cilindro tem corpo com cor dado em c[3] e as bases com cor dados em
 t[3].
 */
 void draw3DCylinder(float x, float y, float z, float h, float r, float c[3], float t[3]) {
-  glColor3f(c[0], c[1], c[2]);
-
   glPushMatrix();
     glTranslatef(x,y,z);
     glBegin(GL_QUAD_STRIP); //exibe uma sequência de quadriláteros conectados a cada 4 vértices
-      for (int i = 0; i < 370; i+=10) {
-        glVertex3f(r*cos(i*PI/180), r*sin(i*PI/180), h/2.0);
-        glVertex3f(r*cos(i*PI/180), r*sin(i*PI/180), -h/2.0);
+      glColor3f(c[0], c[1], c[2]);
+      for (float i = 0; i < 2.0*PI; i+=0.2) { //corpo do cilindro
+        glVertex3f(r*cos(i), r*sin(i), h/2.0);
+        glVertex3f(r*cos(i), r*sin(i), -h/2.0);
       }
+    glEnd();
 
-    for (int i = 0; i < 360; i+=10) {}
+    glBegin(GL_TRIANGLE_FAN);
+      glColor3f(t[0], t[1], t[2]);
+      for (float i = 0; i < 2*PI; i+=0.2) { //tampas
+
+      }
     glEnd();
   glPopMatrix();
 }
@@ -133,13 +173,18 @@ void display(void) {
     glRotatef((GLfloat)horizontal, 1.0, .0, .0);
     glTranslatef(-1.0, 0.0, 0.0);
 
-
+    glPushMatrix();
+    glTranslatef(-.75, -2.5, -2);
+      glRotatef((GLfloat)90, .0, 1.0, .0);
+      glColor3f(1.0, .5, .5);
+      glutSolidTorus (0.275, 0.85, 8, 15);
+    glPopMatrix();
 
     glBegin(GL_QUADS); //CHÃO
-      glColor3f(1.0, 1.0, 1.0); glVertex3f(-1.01, 5.0, 5.0); // coord. x está um pouco abaixo de 1 para que não dê pra ver o braço na parte de baixo do chão
-      glColor3f(.6, .6, .6); glVertex3f(-1.01, -5.0, 5.0);
+      glColor3f(.3, .3, .3); glVertex3f(-1.01, 5.0, 5.0); // coord. x está um pouco abaixo de 1 para que não dê pra ver o braço na parte de baixo do chão
+      glColor3f(.3, .3, .3); glVertex3f(-1.01, -5.0, 5.0);
       glColor3f(.3, .3, .3); glVertex3f(-1.01, -5.0, -5.0);
-      glColor3f(.0, .0, .0); glVertex3f(-1.01, 5.0, -5.0);
+      glColor3f(.3, .3, .3); glVertex3f(-1.01, 5.0, -5.0);
     glEnd();
 
     glTranslatef(-1.0, .0, .0);
@@ -207,7 +252,6 @@ void reshape(int w, int h) {
   gluPerspective(65.0, (GLfloat)w / (GLfloat)h, 1.0, 20.0);
   glMatrixMode(GL_MODELVIEW);
   glLoadIdentity();
-  //glTranslatef (0.0, 0.0, -5.0);
   gluLookAt(0.0, 0.0, 5.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0);
 }
 void TeclasEspeciais(int key, int x, int y) {
@@ -230,7 +274,7 @@ void TeclasEspeciais(int key, int x, int y) {
 void keyboard(unsigned char key, int x, int y) {
   switch (key) {
   case 's': /*  s key rotates at shoulder  */
-    if (shoulder >= -150) shoulder -= soma;
+    if (shoulder >= -60) shoulder -= soma;
     break;
   case 'S':
     if (shoulder <= 0) shoulder += soma;
@@ -298,7 +342,6 @@ int main(int argc, char **argv) {
 }
 
 
-
 /**
   Atribui valores aleatórios aos elementos de uma matriz de floats [8][3]
 */
@@ -306,7 +349,7 @@ void randomColors(float matriz[8][3]) {
   for (int i = 0; i < 8; i++) {
     for (int j = 0; j < 3; j++) {
       matriz[i][j] = (rand()%255) / 255.0;
-      printf("colors[%u][%u]: %f\n", i, j, matriz[i][j]);
+      printf("colors[%u][%u]: %.4f\n", i, j, matriz[i][j]);
     }
   }
 }
