@@ -144,22 +144,21 @@ Desenha um cilindro que se extende no eixo Z cujo centro é (x,y,z), tem altura 
 e raio r. O cilindro tem corpo com cor dado em c[3] e as bases com cor dados em
 t[3].
 */
-void draw3DCylinder(float x, float y, float z, float h, float r, float c[3], float t[3]) {
+void draw3DCylinder(float x, float y, float z, float h, float r, float c[3], float t[3],float rotacao) {
+  int X = 180;
+  glColor3f(c[0], c[1], c[2]);
+
   glPushMatrix();
+
     glTranslatef(x,y,z);
+    glRotatef(((GLfloat)rotacao), .0, .0, 1.0);
     glBegin(GL_QUAD_STRIP); //exibe uma sequência de quadriláteros conectados a cada 4 vértices
-      glColor3f(c[0], c[1], c[2]);
-      for (float i = 0; i < 2.0*PI; i+=0.2) { //corpo do cilindro
-        glVertex3f(r*cos(i), r*sin(i), h/2.0);
-        glVertex3f(r*cos(i), r*sin(i), -h/2.0);
+      for (int i = 0; i <180-rotacao; i+=10) {
+        glVertex3f(r*cos(i*PI/X), r*sin(i*PI/X), h/2.0);
+        glVertex3f(r*cos(i*PI/X), r*sin(i*PI/X), -h/2.0);
       }
-    glEnd();
 
-    glBegin(GL_TRIANGLE_FAN);
-      glColor3f(t[0], t[1], t[2]);
-      for (float i = 0; i < 2*PI; i+=0.2) { //tampas
-
-      }
+    for (int i = 0; i < 360; i+=10) {}
     glEnd();
   glPopMatrix();
 }
@@ -173,35 +172,30 @@ void display(void) {
     glRotatef((GLfloat)horizontal, 1.0, .0, .0);
     glTranslatef(-1.0, 0.0, 0.0);
 
-    glPushMatrix();
-    glTranslatef(-.75, -2.5, -2);
-      glRotatef((GLfloat)90, .0, 1.0, .0);
-      glColor3f(1.0, .5, .5);
-      glutSolidTorus (0.275, 0.85, 8, 15);
-    glPopMatrix();
+
 
     glBegin(GL_QUADS); //CHÃO
-      glColor3f(.3, .3, .3); glVertex3f(-1.01, 5.0, 5.0); // coord. x está um pouco abaixo de 1 para que não dê pra ver o braço na parte de baixo do chão
-      glColor3f(.3, .3, .3); glVertex3f(-1.01, -5.0, 5.0);
+      glColor3f(1.0, 1.0, 1.0); glVertex3f(-1.01, 5.0, 5.0); // coord. x está um pouco abaixo de 1 para que não dê pra ver o braço na parte de baixo do chão
+      glColor3f(.6, .6, .6); glVertex3f(-1.01, -5.0, 5.0);
       glColor3f(.3, .3, .3); glVertex3f(-1.01, -5.0, -5.0);
-      glColor3f(.3, .3, .3); glVertex3f(-1.01, 5.0, -5.0);
+      glColor3f(.0, .0, .0); glVertex3f(-1.01, 5.0, -5.0);
     glEnd();
 
-    glTranslatef(-1.0, .0, .0);
+    glTranslatef(-1.0, -.2, .0);
     glRotatef((GLfloat)shoulder, .0, .0, 1.0);
-    glTranslatef(1.0, .0, .0);
-    draw3DCylinder(1.0, 0.0, 0.0, 1, 0.2, cil, cil);
+    glTranslatef(1.0, .2, .0);
+    draw3DCylinder(1.0, -0.2, 0.0, 1, 0.4, cil, cil, elbow);
     draw3DRectangle(.0, .0, .0, 2.0, .4, 1.0, ombro);
 
-    glTranslatef(1.0, .0, .0);
+    glTranslatef(1.0, -0.2, .0);
     glRotatef((GLfloat)elbow, .0, .0, 1.0); //rotaciona em torno do eixo Z do objeto
-    glTranslatef(.5, .0, .0);
-    draw3DCylinder(0.5, 0.0, 0.0, 1, 0.2, cil, cil);
+    glTranslatef(.5, .2, .0);
+    draw3DCylinder(0.5, -0.2, 0.0, 1, 0.4, cil, cil,fist);
     draw3DRectangle(.0, .0, .0, 1.0, .4, 1.0, antebraco);
 
-    glTranslatef(.5, .0, .0);
+    glTranslatef(.5, -.2, .0);
     glRotatef((GLfloat)fist, .0, .0, 1.0); //rotaciona em torno do eixo Z do objeto
-    glTranslatef(.75, .0, .0);
+    glTranslatef(.75, .2, .0);
     draw3DRectangle(.0, .0, .0, 1.5, -.4, 1.0, punho);
 
     glTranslatef(.75, .0, .0);
