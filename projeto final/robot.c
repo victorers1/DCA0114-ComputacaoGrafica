@@ -23,9 +23,10 @@
 #include <GL/gl.h>
 #include <GL/glu.h>
 #include <GL/glut.h>
-#include <stdlib.h> //rand
-#include <stdio.h> //printf
-#include <math.h>
+#include <stdlib.h> //rand()
+#include <time.h> // time()
+#include <stdio.h> //printf()
+#include <math.h> //cos(), sin()
 
 # define PI 3.14159265358979323846
 
@@ -39,9 +40,7 @@ float punho[8][3];
 float dedo1[8][3];
 float dedo2[8][3]; //dedo do meio
 float dedo3[8][3];
-float cil[3] = {1.0, 1.0, 1.0};
-
-
+float cil[3] = {0};
 
 //GLfloat ambientColor[] = {0.4f, 0.4f, 0.4f, 1.0f}; //Color(0.2, 0.2, 0.2)
 //GLfloat light0color[]    = { 1.0, 1.0, 1.0, 0.0 };
@@ -83,6 +82,7 @@ void init(void) {
   glMaterialfv(GL_FRONT, GL_SPECULAR, mat_specular);
   glMaterialfv(GL_FRONT, GL_SHININESS, low_shininess);
 
+  srand(time(NULL));
   //Cria cores
   randomColors(ombro);
   randomColors(antebraco);
@@ -90,6 +90,11 @@ void init(void) {
   randomColors(dedo1);
   randomColors(dedo2);
   randomColors(dedo3);
+
+  for(int i=0; i<3; i++) {
+    cil[i] = (rand()%255)/255.0;
+    printf("cil[%u] = %f\n", i, cil[i]);
+  }
 }
 
 /**
@@ -142,23 +147,38 @@ void draw3DRectangle(float x, float y, float z, float w, float h, float l, float
 /**
 Desenha um cilindro que se extende no eixo Z cujo centro é (x,y,z), tem altura h
 e raio r. O cilindro tem corpo com cor dado em c[3] e as bases com cor dados em
-t[3].
-*/
-void draw3DCylinder(float x, float y, float z, float h, float r, float c[3], float t[3],float rotacao) {
+t[3]. */
+void draw3DCylinder(float x, float y, float z, float h, float r, float c[3], float t[3], float rotacao) {
   int X = 180;
-  glColor3f(c[0], c[1], c[2]);
 
   glPushMatrix();
-
     glTranslatef(x,y,z);
     glRotatef(((GLfloat)rotacao), .0, .0, 1.0);
+
+    glColor3f(c[0], c[1], c[2]);
     glBegin(GL_QUAD_STRIP); //exibe uma sequência de quadriláteros conectados a cada 4 vértices
-      for (int i = 0; i <180-rotacao; i+=10) {
+      for (int i = 90; i <=90-rotacao; i+=1) { //i<=180-rotacao
         glVertex3f(r*cos(i*PI/X), r*sin(i*PI/X), h/2.0);
         glVertex3f(r*cos(i*PI/X), r*sin(i*PI/X), -h/2.0);
       }
+    glEnd();
 
-    for (int i = 0; i < 360; i+=10) {}
+    //tampa 1
+    glColor3f(t[0], t[1], t[2]);
+    glBegin(GL_TRIANGLE_FAN);
+      glVertex3f(0,0, z+h/2.0);
+      for (int i = 90; i<=90-rotacao; i+=1) { // i<=180-rotacao
+        glVertex3f(r*cos(i*PI/X), r*sin(i*PI/X), z+h/2.0);
+      }
+    glEnd();
+
+    //tampa 2
+    glColor3f(t[0], t[1], t[2]);
+    glBegin(GL_TRIANGLE_FAN);
+      glVertex3f(0,0, z-h/2.0);
+      for (int i = 90; i<=90-rotacao; i+=1) { // i<=180-rotacao
+        glVertex3f(r*cos(i*PI/X), r*sin(i*PI/X), z-h/2.0);
+      }
     glEnd();
   glPopMatrix();
 }
@@ -171,8 +191,6 @@ void display(void) {
     glRotatef((GLfloat)vertical, .0, 1.0, .0);
     glRotatef((GLfloat)horizontal, 1.0, .0, .0);
     glTranslatef(-1.0, 0.0, 0.0);
-
-
 
     glBegin(GL_QUADS); //CHÃO
       glColor3f(1.0, 1.0, 1.0); glVertex3f(-1.01, 5.0, 5.0); // coord. x está um pouco abaixo de 1 para que não dê pra ver o braço na parte de baixo do chão
