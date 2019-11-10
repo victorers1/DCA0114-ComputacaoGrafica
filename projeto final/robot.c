@@ -42,45 +42,26 @@ float dedo2[8][3]; //dedo do meio
 float dedo3[8][3];
 float cil[3] = {0};
 
-//GLfloat ambientColor[] = {0.4f, 0.4f, 0.4f, 1.0f}; //Color(0.2, 0.2, 0.2)
-//GLfloat light0color[]    = { 1.0, 1.0, 1.0, 0.0 };
-//GLfloat light0position[] = { -5.0, 0.0, 0.0, 0.0 };
+GLfloat mat_specular[] = { 1.0, 1.0, 1.0, 1.0 };
+GLfloat mat_shininess[] = { 50.0 };
+GLfloat mat_diffuse[] = { 1., 1., 1., 1.0 };
+GLfloat light_position[] = { 5.0, .0, .0, 1.0 };
+
+GLfloat ambientColor[] = {0.4f, 0.4f, 0.4f, 1.0f}; //Color(0.2, 0.2, 0.2)
+GLfloat light0color[]    = { 1.0, 1.0, 1.0, 0.0 };
 
 void init(void) {
   glClearColor(0.0, 0.0, 0.0, 0.0);
-  glShadeModel(GL_SMOOTH);
-
-  glEnable(GL_DEPTH_TEST);
-  // glEnable(GL_LIGHTING);
-  // glEnable(GL_LIGHT0);
-  // glEnable(GL_COLOR_MATERIAL);
-  // glEnable(GL_NORMALIZE);
-
-/*GLfloat mat_specular[] = { 1.0, 1.0, 1.0, 1.0 };
-  GLfloat mat_shininess[] = { 50.0 };
+  glShadeModel (GL_SMOOTH);
 
   glMaterialfv(GL_FRONT, GL_SPECULAR, mat_specular);
   glMaterialfv(GL_FRONT, GL_SHININESS, mat_shininess);
-  glLightfv(GL_LIGHT0, GL_POSITION, light_position);*/
+  //glLightfv(GL_LIGHT0, GL_DIFFUSE, mat_diffuse);
 
-
-  GLfloat ambientColor[] = {0.4f, 0.4f, 0.4f, 1.0f}; //Color(0.2, 0.2, 0.2)
-  GLfloat light0color[]    = { 1.0, 1.0, 1.0, 0.0 };
-  GLfloat light0position[] = { 15.0, 5.0, 15.0, 0.0 };		// x, y, z, 1:directional 0:point
-
-  GLfloat mat_diffuse[] = { 0.6, 0.6, 0.6, 1.0 };
-  GLfloat mat_ambient[] = { 0.4, 0.4, 0.4, 1.0 };
-  GLfloat mat_specular[] = { 1.0, 1.0, 1.0, 1.0 };
-  GLfloat low_shininess[] = { 50.0 };
-
-  glLightModelfv(GL_LIGHT_MODEL_AMBIENT, ambientColor);
-  glLightfv(GL_LIGHT0, GL_DIFFUSE, light0color);
-  glLightfv(GL_LIGHT0, GL_POSITION, light0position);
-
-  glMaterialfv(GL_FRONT, GL_DIFFUSE, mat_diffuse);
-  glMaterialfv(GL_FRONT, GL_AMBIENT, mat_ambient);
-  glMaterialfv(GL_FRONT, GL_SPECULAR, mat_specular);
-  glMaterialfv(GL_FRONT, GL_SHININESS, low_shininess);
+  glEnable(GL_LIGHTING);
+  glEnable(GL_LIGHT0);
+  glEnable(GL_DEPTH_TEST);
+  glEnable(GL_COLOR_MATERIAL);
 
   srand(time(NULL));
   //Cria cores
@@ -126,7 +107,7 @@ void draw3DRectangle(float x, float y, float z, float w, float h, float l, float
 
     //left
     glColor3f(c[7][0], c[7][1], c[7][2]); glVertex3f(x-w, y+h, z-l); //-+-
-    glColor3f(c[5][0], c[5][1], c[5][2]);  glVertex3f(x-w, y-h, z-l); //---
+    glColor3f(c[5][0], c[5][1], c[5][2]); glVertex3f(x-w, y-h, z-l); //---
     glColor3f(c[1][0], c[1][1], c[1][2]); glVertex3f(x-w, y-h, z+l); //--+
     glColor3f(c[0][0], c[0][1], c[0][2]); glVertex3f(x-w, y+h, z+l); //-++
 
@@ -188,16 +169,33 @@ void display(void) {
 
   glPushMatrix(); //inicio-1
     glRotatef(90, .0, .0, 1.0);
+
     glRotatef((GLfloat)vertical, .0, 1.0, .0);
     glRotatef((GLfloat)horizontal, 1.0, .0, .0);
     glTranslatef(-1.0, 0.0, 0.0);
 
+    glLightfv(GL_LIGHT0, GL_POSITION, light_position);
+    glDisable(GL_LIGHTING);
+    glPushMatrix();
+      glTranslatef(light_position[0], light_position[1], light_position[2]);
+      glutWireCube(.3); //cubo na posição da luz
+    glPopMatrix();
+    glEnable(GL_LIGHTING);
+
     glBegin(GL_QUADS); //CHÃO
-      glColor3f(1.0, 1.0, 1.0); glVertex3f(-1.01, 5.0, 5.0); // coord. x está um pouco abaixo de 1 para que não dê pra ver o braço na parte de baixo do chão
-      glColor3f(.6, .6, .6); glVertex3f(-1.01, -5.0, 5.0);
-      glColor3f(.3, .3, .3); glVertex3f(-1.01, -5.0, -5.0);
-      glColor3f(.0, .0, .0); glVertex3f(-1.01, 5.0, -5.0);
+      glColor3f(.3, .3, .3);
+      glVertex3f(-1.01, 5.0, 5.0); // coord. x está um pouco abaixo de 1 para que não dê pra ver o braço na parte de baixo do chão
+      glVertex3f(-1.01, -5.0, 5.0);
+      glVertex3f(-1.01, -5.0, -5.0);
+      glVertex3f(-1.01, 5.0, -5.0);
     glEnd();
+
+    glPushMatrix();
+    glTranslatef(-.75, -2.5, -2);
+      glRotatef((GLfloat)90, .0, 1.0, .0);
+      glColor3f(1.0, .5, .5);
+      glutSolidTorus (0.275, 0.85, 30, 30);
+    glPopMatrix();
 
     glTranslatef(-1.0, -.2, .0);
     glRotatef((GLfloat)shoulder, .0, .0, 1.0);
@@ -320,6 +318,24 @@ void keyboard(unsigned char key, int x, int y) {
     break;
   case 'O':
     if (d3 <= 0) d3 += soma;
+    break;
+  case 'l':
+    light_position[0]+=0.2;
+    break;
+  case 'L':
+    light_position[0]-=0.2;
+    break;
+  case 'j':
+    light_position[1]+=0.2;
+    break;
+  case 'J':
+    light_position[1]-=0.2;
+    break;
+  case 'k':
+    light_position[2]+=0.2;
+    break;
+  case 'K':
+    light_position[2]-=0.2;
     break;
   case 'c':
     if (elbow >= -50) elbow -= soma;
